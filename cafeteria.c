@@ -160,9 +160,9 @@ int main() {
 
     do {
         limpiarPantalla();
-        puts("==================================================");
-        puts("  SISTEMA DE GESTIÓN - CAFETERÍA DE ESPECIALIDAD  ");
-        puts("==================================================");
+        puts("===============================================");
+        puts("  SISTEMA DE GESTIÓN - CAFETERÍA DE ESPECIALIDAD");
+        puts("===============================================");
         puts("1. Gestión de Inventario");
         puts("2. Caja y Pedidos");
         puts("3. Salir del Sistema");
@@ -230,10 +230,7 @@ int main() {
         }
     } while (opcion_principal != '3');
 
-    return 0;
-}
-
-MapPair *pair = map_first(inventario);
+    MapPair *pair = map_first(inventario);
     while (pair != NULL) {
         free(pair->value);
         pair = map_next(inventario);
