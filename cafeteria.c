@@ -86,3 +86,67 @@ void ver_inventario(Map *inventario) {
         pair = map_next(inventario);
     }
 }
+
+void ingresar_pedido(Map *inventario, List *fila_espera, int *ticket_counter) {
+    char cliente[50];
+    char id_prod[20];
+
+    printf("Ingrese nombre del cliente: ");
+    scanf(" %49[^\n]", cliente);
+
+    printf("Ingrese ID del producto: ");
+    scanf(" %19[^\n]", id_prod);
+
+    MapPair *pair = map_search(inventario, id_prod);
+
+    if (pair == NULL) {
+        printf("Error: Producto agotado o código incorrecto.\n");
+        return;
+    }
+
+    Producto *p = (Producto *)pair->value;
+
+    if (p->stock <= 0) {
+        printf("Error: Producto agotado o código incorrecto.\n");
+        return;
+    }
+
+    Pedido *nuevo = (Pedido *)malloc(sizeof(Pedido));
+    nuevo->ticket = (*ticket_counter)++;
+    strcpy(nuevo->cliente, cliente);
+    strcpy(nuevo->id_producto, id_prod);
+
+    list_pushBack(fila_espera, nuevo);
+    printf("Pedido registrado. Cliente agregado al final de la fila.\n");
+}
+
+void despachar_pedido(Map *inventario, List *fila_espera) {
+    Pedido *p = (Pedido *)list_popFront(fila_espera);
+
+    if (p == NULL) {
+        printf("La fila de espera está vacía.\n");
+        return;
+    }
+
+    MapPair *pair = map_search(inventario, p->id_producto);
+
+    if (pair != NULL) {
+        Producto *prod = (Producto *)pair->value;
+        prod->stock--;
+        printf("Atendiendo a %s - Preparando %s. ¡Inventario descontado!\n", p->cliente, prod->nombre);
+    }
+
+    free(p);
+}
+
+void ver_fila(List *fila_espera) {
+    limpiarPantalla();
+    printf("%-10s | %-30s | %-20s\n", "Ticket", "Cliente", "ID Producto");
+    printf("-----------------------------------------------------------------\n");
+
+    Pedido *p = (Pedido *)list_first(fila_espera);
+    while (p != NULL) {
+        printf("%-10d | %-30s | %-20s\n", p->ticket, p->cliente, p->id_producto);
+        p = (Pedido *)list_next(fila_espera);
+    }
+}
