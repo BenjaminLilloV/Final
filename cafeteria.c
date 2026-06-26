@@ -5,12 +5,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+// Define la entidad base del inventario. Utiliza arreglos de caracteres estáticos 
+// para el ID y el nombre, optimizando la memoria. Los campos de stock y precio 
+// son enteros para facilitar las operaciones matemáticas posteriores en el sistema.
+
 typedef struct {
     char id_producto[20];
     char nombre[50];
     int stock;
     int precio;
 } Producto;
+
+// Modela la orden de un cliente. Almacena el número de ticket secuencial, 
+// el nombre del comprador y la clave (ID) del producto deseado. Esta estructura 
+// será el contenido de cada nodo dentro de la fila de espera.
 
 typedef struct {
     int ticket;
@@ -117,6 +126,7 @@ void ingresar_pedido(Map *inventario, List *fila_espera, int *ticket_counter) {
     strcpy(nuevo->id_producto, id_prod);
 
     list_pushBack(fila_espera, nuevo);
+    p->stock--;
     printf("Pedido registrado. Cliente agregado al final de la fila.\n");
 }
 
@@ -132,7 +142,6 @@ void despachar_pedido(Map *inventario, List *fila_espera) {
 
     if (pair != NULL) {
         Producto *prod = (Producto *)pair->value;
-        prod->stock--;
         printf("Atendiendo a %s - Preparando %s. ¡Inventario descontado!\n", p->cliente, prod->nombre);
     }
 
@@ -160,9 +169,9 @@ int main() {
 
     do {
         limpiarPantalla();
-        puts("===============================================");
-        puts("  SISTEMA DE GESTIÓN - CAFETERÍA DE ESPECIALIDAD");
-        puts("===============================================");
+        puts("==================================================");
+        puts("  SISTEMA DE GESTIÓN - CAFETERÍA DE ESPECIALIDAD  ");
+        puts("==================================================");
         puts("1. Gestión de Inventario");
         puts("2. Caja y Pedidos");
         puts("3. Salir del Sistema");
@@ -230,12 +239,20 @@ int main() {
         }
     } while (opcion_principal != '3');
 
+    // Bucle fundamental para evitar fugas de memoria (memory leaks). Recorre 
+    // cada par del mapa y utiliza la función free() para liberar la memoria 
+    // dinámica de cada estructura Producto antes de destruir el mapa con map_clean.
+
     MapPair *pair = map_first(inventario);
     while (pair != NULL) {
         free(pair->value);
         pair = map_next(inventario);
     }
     map_clean(inventario);
+
+    // Si quedan pedidos sin despachar al momento de cerrar el sistema, este ciclo 
+    // recorre la lista enlazada y libera la memoria de cada estructura Pedido 
+    // antes de vaciar la lista por completo con list_clean.
 
     Pedido *ped = (Pedido *)list_first(fila_espera);
     while (ped != NULL) {
