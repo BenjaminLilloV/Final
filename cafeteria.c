@@ -232,3 +232,19 @@ int main() {
 
     return 0;
 }
+
+MapPair *pair = map_first(inventario);
+    while (pair != NULL) {
+        free(pair->value);
+        pair = map_next(inventario);
+    }
+    map_clean(inventario);
+
+    Pedido *ped = (Pedido *)list_first(fila_espera);
+    while (ped != NULL) {
+        free(ped);
+        ped = (Pedido *)list_next(fila_espera);
+    }
+    list_clean(fila_espera);
+
+    return 0;
