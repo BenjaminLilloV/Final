@@ -248,3 +248,4 @@ MapPair *pair = map_first(inventario);
     list_clean(fila_espera);
 
     return 0;
+}
