@@ -150,3 +150,85 @@ void ver_fila(List *fila_espera) {
         p = (Pedido *)list_next(fila_espera);
     }
 }
+
+int main() {
+    Map *inventario = map_create(is_equal_str);
+    List *fila_espera = list_create();
+    int ticket_counter = 1;
+    char opcion_principal;
+    char opcion_sub;
+
+    do {
+        limpiarPantalla();
+        puts("==================================================");
+        puts("  SISTEMA DE GESTIÓN - CAFETERÍA DE ESPECIALIDAD  ");
+        puts("==================================================");
+        puts("1. Gestión de Inventario");
+        puts("2. Caja y Pedidos");
+        puts("3. Salir del Sistema");
+        printf("Seleccione una opción: ");
+        scanf(" %c", &opcion_principal);
+
+        switch (opcion_principal) {
+        case '1':
+            do {
+                limpiarPantalla();
+                puts("--- Gestión de Inventario ---");
+                puts("1. Agregar nuevo insumo");
+                puts("2. Actualizar stock");
+                puts("3. Ver inventario completo");
+                puts("4. Volver al menú principal");
+                printf("Seleccione una opción: ");
+                scanf(" %c", &opcion_sub);
+
+                if (opcion_sub == '1') {
+                    agregar_insumo(inventario);
+                } else if (opcion_sub == '2') {
+                    actualizar_stock(inventario);
+                } else if (opcion_sub == '3') {
+                    ver_inventario(inventario);
+                }
+
+                if (opcion_sub != '4') {
+                    presioneTeclaParaContinuar();
+                }
+            } while (opcion_sub != '4');
+            break;
+
+        case '2':
+            do {
+                limpiarPantalla();
+                puts("--- Caja y Pedidos ---");
+                puts("1. Ingresar nuevo pedido");
+                puts("2. Despachar próximo pedido");
+                puts("3. Ver fila de espera");
+                puts("4. Volver al menú principal");
+                printf("Seleccione una opción: ");
+                scanf(" %c", &opcion_sub);
+
+                if (opcion_sub == '1') {
+                    ingresar_pedido(inventario, fila_espera, &ticket_counter);
+                } else if (opcion_sub == '2') {
+                    despachar_pedido(inventario, fila_espera);
+                } else if (opcion_sub == '3') {
+                    ver_fila(fila_espera);
+                }
+
+                if (opcion_sub != '4') {
+                    presioneTeclaParaContinuar();
+                }
+            } while (opcion_sub != '4');
+            break;
+
+        case '3':
+            puts("Saliendo del sistema...");
+            break;
+
+        default:
+            puts("Opción no válida.");
+            presioneTeclaParaContinuar();
+        }
+    } while (opcion_principal != '3');
+
+    return 0;
+}
