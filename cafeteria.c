@@ -17,3 +17,72 @@ typedef struct {
     char cliente[50];
     char id_producto[20];
 } Pedido;
+
+int is_equal_str(void *key1, void *key2) {
+    return strcmp((char *)key1, (char *)key2) == 0;
+}
+
+void agregar_insumo(Map *inventario) {
+    Producto *p = (Producto *)malloc(sizeof(Producto));
+
+    printf("Ingrese ID del producto: ");
+    scanf(" %19[^\n]", p->id_producto);
+
+    if (map_search(inventario, p->id_producto) != NULL) {
+        printf("Error: Producto ya registrado en el sistema\n");
+        free(p);
+        return;
+    }
+
+    printf("Ingrese nombre del producto: ");
+    scanf(" %49[^\n]", p->nombre);
+
+    printf("Ingrese cantidad: ");
+    scanf("%d", &p->stock);
+
+    printf("Ingrese precio: ");
+    scanf("%d", &p->precio);
+
+    map_insert(inventario, p->id_producto, p);
+    printf("Insumo agregado con éxito\n");
+}
+
+void actualizar_stock(Map *inventario) {
+    char id[20];
+    int variacion;
+
+    printf("Ingrese ID del producto: ");
+    scanf(" %19[^\n]", id);
+
+    MapPair *pair = map_search(inventario, id);
+
+    if (pair == NULL) {
+        printf("Error: Operación inválida, stock insuficiente\n");
+        return;
+    }
+
+    Producto *p = (Producto *)pair->value;
+
+    printf("Ingrese cantidad a modificar: ");
+    scanf("%d", &variacion);
+
+    if (p->stock + variacion < 0) {
+        printf("Error: Operación inválida, stock insuficiente\n");
+    } else {
+        p->stock += variacion;
+        printf("Stock actualizado\n");
+    }
+}
+
+void ver_inventario(Map *inventario) {
+    limpiarPantalla();
+    printf("%-20s | %-30s | %-10s | %-10s\n", "ID", "Nombre", "Stock", "Precio");
+    printf("-------------------------------------------------------------------------------\n");
+
+    MapPair *pair = map_first(inventario);
+    while (pair != NULL) {
+        Producto *p = (Producto *)pair->value;
+        printf("%-20s | %-30s | %-10d | $%-9d\n", p->id_producto, p->nombre, p->stock, p->precio);
+        pair = map_next(inventario);
+    }
+}
