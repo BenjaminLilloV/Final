@@ -161,12 +161,18 @@ void ver_fila(List *fila_espera) {
 }
 
 int main() {
+    // Inicializa el TDA Mapa para gestionar el inventario de forma eficiente 
+    // y el TDA Lista para controlar la fila de atención. Define un contador 
+    // de tickets que incrementará con cada pedido nuevo.
     Map *inventario = map_create(is_equal_str);
     List *fila_espera = list_create();
     int ticket_counter = 1;
     char opcion_principal;
     char opcion_sub;
 
+    // Implementa un bucle do-while que mantiene el programa en ejecución continua. 
+    // Utiliza una estructura switch para derivar el flujo del programa hacia 
+    // los submenús correspondientes de Inventario o de Caja.
     do {
         limpiarPantalla();
         puts("==================================================");
@@ -239,10 +245,11 @@ int main() {
         }
     } while (opcion_principal != '3');
 
+    //Matías
+
     // Bucle fundamental para evitar fugas de memoria (memory leaks). Recorre 
     // cada par del mapa y utiliza la función free() para liberar la memoria 
     // dinámica de cada estructura Producto antes de destruir el mapa con map_clean.
-
     MapPair *pair = map_first(inventario);
     while (pair != NULL) {
         free(pair->value);
@@ -253,7 +260,6 @@ int main() {
     // Si quedan pedidos sin despachar al momento de cerrar el sistema, este ciclo 
     // recorre la lista enlazada y libera la memoria de cada estructura Pedido 
     // antes de vaciar la lista por completo con list_clean.
-
     Pedido *ped = (Pedido *)list_first(fila_espera);
     while (ped != NULL) {
         free(ped);
