@@ -27,9 +27,17 @@ typedef struct {
     char id_producto[20];
 } Pedido;
 
+// Función de comparación requerida por el TDA Mapa. Recibe dos punteros genéricos, 
+// los convierte a cadenas de texto y utiliza strcmp para verificar si los IDs 
+// coinciden, permitiendo las búsquedas en la tabla hash.
+
 int is_equal_str(void *key1, void *key2) {
     return strcmp((char *)key1, (char *)key2) == 0;
 }
+
+// Solicita los datos al usuario y reserva memoria dinámica (malloc) para un nuevo producto. 
+// Antes de insertarlo, utiliza map_search para validar que el ID no exista previamente, 
+// evitando duplicidad e inconsistencias en la base de datos.
 
 void agregar_insumo(Map *inventario) {
     Producto *p = (Producto *)malloc(sizeof(Producto));
@@ -55,6 +63,10 @@ void agregar_insumo(Map *inventario) {
     map_insert(inventario, p->id_producto, p);
     printf("Insumo agregado con éxito\n");
 }
+
+// Busca el producto por su ID en el mapa. Si existe, solicita la variación 
+// (positiva para agregar, negativa para mermas). Incluye una validación matemática 
+// crucial que impide que el stock final quede en números negativos.
 
 void actualizar_stock(Map *inventario) {
     char id[20];
@@ -83,6 +95,10 @@ void actualizar_stock(Map *inventario) {
     }
 }
 
+// Realiza un recorrido secuencial del mapa utilizando map_first y map_next. 
+// Formatea la salida en consola mediante tabulaciones para mostrar los datos 
+// en una tabla ordenada y fácil de leer para el usuario.
+
 void ver_inventario(Map *inventario) {
     limpiarPantalla();
     printf("%-20s | %-30s | %-10s | %-10s\n", "ID", "Nombre", "Stock", "Precio");
@@ -95,6 +111,11 @@ void ver_inventario(Map *inventario) {
         pair = map_next(inventario);
     }
 }
+
+// Valida la existencia del producto y que su stock sea mayor a cero. Reserva memoria 
+// para un nuevo pedido, le asigna un ticket y lo inserta al final de la lista 
+// (list_pushBack) siguiendo la lógica FIFO. Inmediatamente descuenta el stock 
+// para evitar sobreventas.
 
 void ingresar_pedido(Map *inventario, List *fila_espera, int *ticket_counter) {
     char cliente[50];
@@ -130,6 +151,10 @@ void ingresar_pedido(Map *inventario, List *fila_espera, int *ticket_counter) {
     printf("Pedido registrado. Cliente agregado al final de la fila.\n");
 }
 
+// Extrae el primer elemento de la fila de espera utilizando list_popFront. 
+// Utiliza el ID guardado en el pedido para buscar el nombre real del producto 
+// en el mapa, avisa al usuario que está en preparación y libera la memoria del pedido.
+
 void despachar_pedido(Map *inventario, List *fila_espera) {
     Pedido *p = (Pedido *)list_popFront(fila_espera);
 
@@ -147,6 +172,10 @@ void despachar_pedido(Map *inventario, List *fila_espera) {
 
     free(p);
 }
+
+// Recorre la lista enlazada desde el primer elemento (list_first) hasta el último, 
+// mostrando el orden exacto de los clientes y sus respectivos tickets sin 
+// alterar la estructura original de la cola.
 
 void ver_fila(List *fila_espera) {
     limpiarPantalla();
@@ -244,8 +273,6 @@ int main() {
             presioneTeclaParaContinuar();
         }
     } while (opcion_principal != '3');
-
-    //Matías
 
     // Bucle fundamental para evitar fugas de memoria (memory leaks). Recorre 
     // cada par del mapa y utiliza la función free() para liberar la memoria 
